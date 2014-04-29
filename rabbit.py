@@ -14,11 +14,18 @@ from firebase import firebase
 
 firebase = firebase.FirebaseApplication('https://stylekick-colors.firebaseio.com/', None)
 
+def img_exist(url):
+    try:
+        req = urllib.urlopen(url)
+        arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
+        img = cv2.imdecode(arr,-1)
+        img.shape
+    except Exception, e:
+        return 'no picture'
+    else:
+        return img
 
-def read_url(url):
-    req = urllib.urlopen(url)
-    arr = np.asarray(bytearray(req.read()), dtype=np.uint8)
-    img = cv2.imdecode(arr,-1)
+def shrink_img(img):
     r = 100.0 / img.shape[1]
     dim = (100, int(img.shape[0] * r))
     small = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
@@ -125,27 +132,41 @@ def kmeans(points, k, min_diff):
 
 def get_colors(img, cbg, cnoskin):
     colors = []
-    max_p = img.shape[0] * img.shape[1]
-
+    max_p = (img.shape[0] * img.shape[1])/3
+    print max_p
     for r in range(0,img.shape[0]):
         for c in range(0,img.shape[1]):
             if cnoskin[r][c] == cbg[r][c] == 0:
                 colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
-    if len(colors) < max_p/10:
+    print 'origin'
+    print len(colors)
+
+    if len(colors) < max_p:
         colors = []
         for r in range(0,img.shape[0]):
             for c in range(0,img.shape[1]):
                 if cnoskin[r][c] == 0:
                     colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
-    elif len(colors) < max_p/10:
+    print 'no bg'
+    print len(colors)
+
+    if len(colors) < max_p:
+        colors = []
         for r in range(0,img.shape[0]):
             for c in range(0,img.shape[1]):
                 if cbg[r][c] == 0:
                     colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
-    else:
+    print 'no skin'
+    print len(colors)
+
+    if len(colors) < max_p:
+        colors = []
         for r in range(0,img.shape[0]):
             for c in range(0,img.shape[1]):
                 colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
+    print 'nothing'
+    print len(colors)
+
     return colors
 
 def hex_to_rgb(value):
@@ -184,26 +205,27 @@ def get_color_name(p):
     print platter[rgb_to_hex(rgbs[distances.index(min(distances))])]
 
 def get_d_color(url):
-    img = read_url(url)
-    noskin = remove_skin(img)
-    bg = remove_bg(img)
-    cbg = crop(bg)
-    cnoskin = crop(noskin)
-    img = crop(img)
+    img = img_exist(url)
+    if img == 'no picture':
+        print 'No picture, man'
+        return False
+    else:
+        img = shrink_img(img)
+        noskin = remove_skin(img)
+        bg = remove_bg(img)
+        cbg = crop(bg)
+        cnoskin = crop(noskin)
+        img = crop(img)
+        colors = get_colors(img, cbg, cnoskin)
+
+        get_color_name(colorz(colors))
+
+
     cv2.imwrite('cbg.png', cbg)
     cv2.imwrite('cnoskin.png', cnoskin)
     cv2.imwrite('img.png', img)
 
-    try:
-        colors = get_colors(img, cbg, cnoskin)
-        if len(colors) < 1000:
-            print 'Try: skin covers most of picture'
-            colors = get_colors(img, cbg, [])
-    except Exception, e:
-        print 'Try(e): it without skin removal.'
-        colors = get_colors(img, cbg, [])
 
-    get_color_name(colorz(colors))
 
 def get_styles(url):
     req = urllib.urlopen(url).read()
@@ -224,7 +246,7 @@ if __name__ == "__main__":
     # for page in range(1,100):
     #     url = 'http://www.stylekick.com/api/v1/styles?page='
     #     get_styles(url + str(page))
-    get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/9420/large_grid_4377_white')
+    get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/172053/rsa4401w_forest')
 
 
 
