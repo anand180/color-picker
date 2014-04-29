@@ -75,16 +75,19 @@ def get_points(colors):
 
 rtoh = lambda rgb: '#%s' % ''.join(('%02x' % p for p in rgb))
 
-def colorz(colors, n=3):
+def colorz(colors, n=5):
 
     points = get_points(colors)
-    clusters = kmeans(points, 3, 1)
+    print len(points)
+    clusters = kmeans(points, n, 1)
     size = len(colors)/100
-    sizes = [len(clusters[0].points)/size, len(clusters[1].points)/size, len(clusters[2].points)/size]
+    sizes = []
+    for x in range(n):
+        sizes.append(len(clusters[x].points)/size)
     rgbs = [map(int, c.center.coords) for c in clusters]
     print 'percentage: ' + str(sizes)
     print 'Color(org): ' + str(map(rtoh, rgbs))
-    for x in range(3):
+    for x in range(n):
         save_color(sizes[x], map(rtoh, rgbs)[x])
     return rgbs[sizes.index(max(sizes))]
 
@@ -93,11 +96,16 @@ def euclidean(p1, p2):
 
 def calculate_center(points, n):
     vals = [0.0 for i in range(n)]
-    plen = 0
+    plen = 1
     for p in points:
         plen += p.ct
         for i in range(n):
             vals[i] += (p.coords[i] * p.ct)
+    # print '----'
+    # print vals
+    # print plen
+    # print points
+    # print n
     return Point([(v / plen) for v in vals], n, 1)
 
 def kmeans(points, k, min_diff):
@@ -132,7 +140,7 @@ def kmeans(points, k, min_diff):
 
 def get_colors(img, cbg, cnoskin):
     colors = []
-    max_p = (img.shape[0] * img.shape[1])/3
+    max_p = (img.shape[0] * img.shape[1])/2.5
     print max_p
     for r in range(0,img.shape[0]):
         for c in range(0,img.shape[1]):
@@ -147,8 +155,8 @@ def get_colors(img, cbg, cnoskin):
             for c in range(0,img.shape[1]):
                 if cnoskin[r][c] == 0:
                     colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
-    print 'no bg'
-    print len(colors)
+        print 'no bg'
+        print len(colors)
 
     if len(colors) < max_p:
         colors = []
@@ -156,16 +164,16 @@ def get_colors(img, cbg, cnoskin):
             for c in range(0,img.shape[1]):
                 if cbg[r][c] == 0:
                     colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
-    print 'no skin'
-    print len(colors)
+        print 'no skin'
+        print len(colors)
 
     if len(colors) < max_p:
         colors = []
         for r in range(0,img.shape[0]):
             for c in range(0,img.shape[1]):
                 colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
-    print 'nothing'
-    print len(colors)
+        print 'nothing'
+        print len(colors)
 
     return colors
 
@@ -216,14 +224,15 @@ def get_d_color(url):
         cbg = crop(bg)
         cnoskin = crop(noskin)
         img = crop(img)
+        cv2.imwrite('cbg.png', cbg)
+        cv2.imwrite('cnoskin.png', cnoskin)
+        cv2.imwrite('img.png', img)
         colors = get_colors(img, cbg, cnoskin)
 
         get_color_name(colorz(colors))
 
 
-    cv2.imwrite('cbg.png', cbg)
-    cv2.imwrite('cnoskin.png', cnoskin)
-    cv2.imwrite('img.png', img)
+
 
 
 
@@ -246,7 +255,7 @@ if __name__ == "__main__":
     # for page in range(1,100):
     #     url = 'http://www.stylekick.com/api/v1/styles?page='
     #     get_styles(url + str(page))
-    get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/172053/rsa4401w_forest')
+    get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/183307/W41D27W4WK0-JBLK')
 
 
 
