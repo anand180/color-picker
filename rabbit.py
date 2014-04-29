@@ -75,7 +75,7 @@ def get_points(colors):
 
 rtoh = lambda rgb: '#%s' % ''.join(('%02x' % p for p in rgb))
 
-def colorz(colors, n=5):
+def colorz(colors, n=3):
 
     points = get_points(colors)
     print len(points)
@@ -138,16 +138,33 @@ def kmeans(points, k, min_diff):
 
     return clusters
 
+def get_bg_color(img, bg, skin):
+    colors = []
+    for r in range(0,img.shape[0]):
+        for c in range(0,img.shape[1]):
+            if bg[r][c] == 255 and skin[r][c] == 0:
+                colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
+    return colorz(colors, 3)
+
 def get_colors(img, cbg, cnoskin):
     colors = []
-    max_p = (img.shape[0] * img.shape[1])/2.5
+    max_p = (img.shape[0] * img.shape[1])/8
     print max_p
     for r in range(0,img.shape[0]):
         for c in range(0,img.shape[1]):
             if cnoskin[r][c] == cbg[r][c] == 0:
                 colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
-    print 'origin'
+    print '====='
     print len(colors)
+    print max_p
+    if len(colors) > max_p:
+        return colors
+    else:
+        return guess_colors(img, cbg, cnoskin)
+
+def guess_colors(img, cbg, cnoskin):
+    colors = []
+    max_p = (img.shape[0] * img.shape[1])/2.5
 
     if len(colors) < max_p:
         colors = []
@@ -212,6 +229,9 @@ def get_color_name(p):
     # print distances.index(min(distances))
     print platter[rgb_to_hex(rgbs[distances.index(min(distances))])]
 
+def compare_color(bg, img):
+    pass
+
 def get_d_color(url):
     img = img_exist(url)
     if img == 'no picture':
@@ -221,6 +241,7 @@ def get_d_color(url):
         img = shrink_img(img)
         noskin = remove_skin(img)
         bg = remove_bg(img)
+        # bg_color = get_bg_color(img, bg, noskin)
         cbg = crop(bg)
         cnoskin = crop(noskin)
         img = crop(img)
@@ -228,8 +249,8 @@ def get_d_color(url):
         cv2.imwrite('cnoskin.png', cnoskin)
         cv2.imwrite('img.png', img)
         colors = get_colors(img, cbg, cnoskin)
-
-        get_color_name(colorz(colors))
+        img_colors = colorz(colors)
+        get_color_name(img_colors)
 
 
 
@@ -252,10 +273,10 @@ def save_color(per, v):
 
 
 if __name__ == "__main__":
-    # for page in range(1,100):
-    #     url = 'http://www.stylekick.com/api/v1/styles?page='
-    #     get_styles(url + str(page))
-    get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/183307/W41D27W4WK0-JBLK')
+    for page in range(1,100):
+        url = 'http://www.stylekick.com/api/v1/styles?page='
+        get_styles(url + str(page))
+    # get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/7372/rsacl302_lilac')
 
 
 
