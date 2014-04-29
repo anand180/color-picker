@@ -8,6 +8,12 @@ from collections import namedtuple
 from math import sqrt
 import random
 from PIL import Image
+import json
+from firebase import firebase
+from firebase import firebase
+
+firebase = firebase.FirebaseApplication('https://stylekick-colors.firebaseio.com/', None)
+
 
 def read_url(url):
     req = urllib.urlopen(url)
@@ -17,40 +23,18 @@ def read_url(url):
     dim = (100, int(img.shape[0] * r))
     small = cv2.resize(img, dim, interpolation = cv2.INTER_AREA)
     small = cv2.medianBlur(small,3)
-    cv2.imwrite('small.png', small)
-
-
 
     return small
 
 def remove_skin(img):
     im_ycrcb = cv2.cvtColor(img, cv2.COLOR_BGR2YCR_CB)
-
     skin_ycrcb_mint = np.array((0, 133, 77))
     skin_ycrcb_maxt = np.array((255, 173, 127))
     skin_ycrcb = cv2.inRange(im_ycrcb, skin_ycrcb_mint, skin_ycrcb_maxt)
-
     mask = cv2.bitwise_not(skin_ycrcb)
     # pdb.set_trace()
-
     new_img = np.zeros((img.shape[0],img.shape[1],4), np.uint8)
-
-    # r = 0
-    # for row in mask:
-    #     c = 0
-    #     for b_pixal in row:
-    #         if b_pixal == 0:
-    #             new_img[r][c] = [0, 0, 0, 0]
-    #         else:
-    #             new_img[r][c] = [img[r][c][0], img[r][c][1], img[r][c][2], 255]
-    #         c += 1
-    #     r += 1
-
-    cv2.imwrite('noskin.png', skin_ycrcb)
-
-    # skin_ycrcb = cv2.bitwise_and(img, img, mask=mask)
     return skin_ycrcb
-    # cv2.imshow('img', skin_ycrcb)
 
 def remove_bg(img):
     gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
@@ -58,17 +42,12 @@ def remove_bg(img):
     fg = cv2.erode(thresh,None,iterations = 2)
     bgt = cv2.dilate(thresh,None,iterations = 3)
     ret,bg = cv2.threshold(bgt,1,128,1)
-    cv2.imwrite('bg-1.png', bg)
-
     marker = cv2.add(fg,bg)
     marker32 = np.int32(marker)
     cv2.watershed(img,marker32)
     m = cv2.convertScaleAbs(marker32)
     ret,thresh = cv2.threshold(m,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    cv2.imwrite('bg-2.png', thresh)
-
     # res = cv2.bitwise_and(img,img,mask = thresh)
-    # cv2.imwrite('bg.png', res)
 
     return thresh
 
@@ -90,22 +69,17 @@ def get_points(colors):
 rtoh = lambda rgb: '#%s' % ''.join(('%02x' % p for p in rgb))
 
 def colorz(colors, n=3):
-    # img = Image.open(img)
-    # w, h = img.size
 
     points = get_points(colors)
     clusters = kmeans(points, 3, 1)
     size = len(colors)/100
-    # pdb.set_trace()
-    print size
-
     sizes = [len(clusters[0].points)/size, len(clusters[1].points)/size, len(clusters[2].points)/size]
-    print sizes
     rgbs = [map(int, c.center.coords) for c in clusters]
+    print 'percentage: ' + str(sizes)
+    print 'Color(org): ' + str(map(rtoh, rgbs))
+    for x in range(3):
+        save_color(sizes[x], map(rtoh, rgbs)[x])
     return rgbs[sizes.index(max(sizes))]
-
-    # return rgbs
-    # map(rtoh, rgbs)
 
 def euclidean(p1, p2):
     return sqrt(sum([(p1.coords[i] - p2.coords[i]) ** 2 for i in range(p1.n)]))
@@ -151,16 +125,27 @@ def kmeans(points, k, min_diff):
 
 def get_colors(img, cbg, cnoskin):
     colors = []
-    if len(cnoskin) != 0:
+    max_p = img.shape[0] * img.shape[1]
+
+    for r in range(0,img.shape[0]):
+        for c in range(0,img.shape[1]):
+            if cnoskin[r][c] == cbg[r][c] == 0:
+                colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
+    if len(colors) < max_p/10:
+        colors = []
         for r in range(0,img.shape[0]):
             for c in range(0,img.shape[1]):
-                if cnoskin[r][c] == cbg[r][c] == 0:
+                if cnoskin[r][c] == 0:
                     colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
-    else:
+    elif len(colors) < max_p/10:
         for r in range(0,img.shape[0]):
             for c in range(0,img.shape[1]):
                 if cbg[r][c] == 0:
                     colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
+    else:
+        for r in range(0,img.shape[0]):
+            for c in range(0,img.shape[1]):
+                colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
     return colors
 
 def hex_to_rgb(value):
@@ -172,34 +157,34 @@ def rgb_to_hex(rgb):
     return '#%02x%02x%02x' % rgb
 
 def get_color_name(p):
-    # platter = {}
-    # platter['#eeeee3'] = 'beige'
-    # platter['#2626d9'] = 'blue'
-    # platter['#864949'] = 'brown'
-    # platter['#d9bb26'] = 'gold'
-    # platter['#136d13'] = 'green'
-    # platter['#13136d'] = 'navy'
-    # platter['#f6c9d2'] = 'pink'
-    # platter['#d92626'] = 'red'
-    # platter['#c0c0c0'] = 'silver'
-    # platter['#d99726'] = 'orange'
-    # platter['#6d136d'] = 'purple'
-    # platter['#26d9d9'] = 'aqua'
-    # platter['#d9d626'] = 'yellow'
-    # platter['#808080'] = 'grey'
-    # platter['#000000'] = 'black'
-    # platter['#ffffff'] = 'white'
-    rgbs = [(0, 0, 0), (0, 0, 64), (0, 0, 128), (0, 0, 192), (0, 0, 256), (0, 64, 0), (0, 64, 64), (0, 64, 128), (0, 64, 192), (0, 64, 256), (0, 128, 0), (0, 128, 64), (0, 128, 128), (0, 128, 192), (0, 128, 256), (0, 192, 0), (0, 192, 64), (0, 192, 128), (0, 192, 192), (0, 192, 256), (0, 256, 0), (0, 256, 64), (0, 256, 128), (0, 256, 192), (0, 256, 256), (64, 0, 0), (64, 0, 64), (64, 0, 128), (64, 0, 192), (64, 0, 256), (64, 64, 0), (64, 64, 64), (64, 64, 128), (64, 64, 192), (64, 64, 256), (64, 128, 0), (64, 128, 64), (64, 128, 128), (64, 128, 192), (64, 128, 256), (64, 192, 0), (64, 192, 64), (64, 192, 128), (64, 192, 192), (64, 192, 256), (64, 256, 0), (64, 256, 64), (64, 256, 128), (64, 256, 192), (64, 256, 256), (128, 0, 0), (128, 0, 64), (128, 0, 128), (128, 0, 192), (128, 0, 256), (128, 64, 0), (128, 64, 64), (128, 64, 128), (128, 64, 192), (128, 64, 256), (128, 128, 0), (128, 128, 64), (128, 128, 128), (128, 128, 192), (128, 128, 256), (128, 192, 0), (128, 192, 64), (128, 192, 128), (128, 192, 192), (128, 192, 256), (128, 256, 0), (128, 256, 64), (128, 256, 128), (128, 256, 192), (128, 256, 256), (192, 0, 0), (192, 0, 64), (192, 0, 128), (192, 0, 192), (192, 0, 256), (192, 64, 0), (192, 64, 64), (192, 64, 128), (192, 64, 192), (192, 64, 256), (192, 128, 0), (192, 128, 64), (192, 128, 128), (192, 128, 192), (192, 128, 256), (192, 192, 0), (192, 192, 64), (192, 192, 128), (192, 192, 192), (192, 192, 256), (192, 256, 0), (192, 256, 64), (192, 256, 128), (192, 256, 192), (192, 256, 256), (256, 0, 0), (256, 0, 64), (256, 0, 128), (256, 0, 192), (256, 0, 256), (256, 64, 0), (256, 64, 64), (256, 64, 128), (256, 64, 192), (256, 64, 256), (256, 128, 0), (256, 128, 64), (256, 128, 128), (256, 128, 192), (256, 128, 256), (256, 192, 0), (256, 192, 64), (256, 192, 128), (256, 192, 192), (256, 192, 256), (256, 256, 0), (256, 256, 64), (256, 256, 128), (256, 256, 192), (256, 256, 256)]
+    platter = {}
+    platter['#eeeee3'] = 'beige'
+    platter['#2626d9'] = 'blue'
+    platter['#864949'] = 'brown'
+    platter['#d9bb26'] = 'gold'
+    platter['#136d13'] = 'green'
+    platter['#13136d'] = 'navy'
+    platter['#f6c9d2'] = 'pink'
+    platter['#d92626'] = 'red'
+    platter['#c0c0c0'] = 'silver'
+    platter['#d99726'] = 'orange'
+    platter['#6d136d'] = 'purple'
+    platter['#26d9d9'] = 'aqua'
+    platter['#d9d626'] = 'yellow'
+    platter['#808080'] = 'grey'
+    platter['#000000'] = 'black'
+    platter['#ffffff'] = 'white'
+    rgbs = [(246, 201, 210), (109, 19, 109), (128, 128, 128), (217, 151, 38), (0, 0, 0), (19, 19, 109), (38, 217, 217), (192, 192, 192), (19, 109, 19), (217, 214, 38), (238, 238, 227), (217, 187, 38), (217, 38, 38), (38, 38, 217), (134, 73, 73), (255, 255, 255)]
     distances = []
     for c in rgbs:
         distances.append(int(sqrt(sum([(c[i] - p[i]) ** 2 for i in range(3)]))))
-    print distances
-    print min(distances)
-    print distances.index(min(distances))
-    print rgb_to_hex(rgbs[distances.index(min(distances))])
+    # print distances
+    # print min(distances)
+    # print distances.index(min(distances))
+    print platter[rgb_to_hex(rgbs[distances.index(min(distances))])]
 
-if __name__ == "__main__":
-    img = read_url('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/89530/2468e13322add2774fc012e038a59dc2_best.jpg')
+def get_d_color(url):
+    img = read_url(url)
     noskin = remove_skin(img)
     bg = remove_bg(img)
     cbg = crop(bg)
@@ -209,20 +194,39 @@ if __name__ == "__main__":
     cv2.imwrite('cnoskin.png', cnoskin)
     cv2.imwrite('img.png', img)
 
-    # colors = get_colors(img, cbg, cnoskin)
-
     try:
         colors = get_colors(img, cbg, cnoskin)
         if len(colors) < 1000:
+            print 'Try: skin covers most of picture'
             colors = get_colors(img, cbg, [])
     except Exception, e:
-        print 'i am in try'
+        print 'Try(e): it without skin removal.'
         colors = get_colors(img, cbg, [])
 
-
-
-    colors = get_colors(img, cnoskin, cbg)
-    colorz(colors)
     get_color_name(colorz(colors))
+
+def get_styles(url):
+    req = urllib.urlopen(url).read()
+    result = json.loads(req)
+    for x in range(30):
+        styles = result['styles'][x]['product']['styles']
+        for style in styles:
+            print style['large_grid_image_url']
+            get_d_color(style['large_grid_image_url'])
+
+
+def save_color(per, v):
+    result = firebase.post('/colors/' + str(per), v)
+    print result
+
+
+if __name__ == "__main__":
+    # for page in range(1,100):
+    #     url = 'http://www.stylekick.com/api/v1/styles?page='
+    #     get_styles(url + str(page))
+    get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/9420/large_grid_4377_white')
+
+
+
 
 
