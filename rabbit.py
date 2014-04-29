@@ -10,7 +10,6 @@ import random
 from PIL import Image
 import json
 from firebase import firebase
-from firebase import firebase
 
 firebase = firebase.FirebaseApplication('https://stylekick-colors.firebaseio.com/', None)
 
@@ -87,8 +86,8 @@ def colorz(colors, n=3):
     rgbs = [map(int, c.center.coords) for c in clusters]
     print 'percentage: ' + str(sizes)
     print 'Color(org): ' + str(map(rtoh, rgbs))
-    for x in range(n):
-        save_color(sizes[x], map(rtoh, rgbs)[x])
+    # for x in range(n):
+    #     save_color(sizes[x], map(rtoh, rgbs)[x])
     return rgbs[sizes.index(max(sizes))]
 
 def euclidean(p1, p2):
@@ -148,15 +147,13 @@ def get_bg_color(img, bg, skin):
 
 def get_colors(img, cbg, cnoskin):
     colors = []
-    max_p = (img.shape[0] * img.shape[1])/8
+    max_p = (img.shape[0] * img.shape[1])/6
     print max_p
     for r in range(0,img.shape[0]):
         for c in range(0,img.shape[1]):
             if cnoskin[r][c] == cbg[r][c] == 0:
                 colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
-    print '====='
     print len(colors)
-    print max_p
     if len(colors) > max_p:
         return colors
     else:
@@ -233,27 +230,31 @@ def compare_color(bg, img):
     pass
 
 def get_d_color(url):
-    img = img_exist(url)
-    if img == 'no picture':
+    origin_img = img_exist(url)
+    if origin_img == 'no picture':
         print 'No picture, man'
         return False
     else:
-        img = shrink_img(img)
+        img = shrink_img(origin_img)
         noskin = remove_skin(img)
         bg = remove_bg(img)
         # bg_color = get_bg_color(img, bg, noskin)
         cbg = crop(bg)
         cnoskin = crop(noskin)
         img = crop(img)
-        cv2.imwrite('cbg.png', cbg)
-        cv2.imwrite('cnoskin.png', cnoskin)
-        cv2.imwrite('img.png', img)
+        # cv2.imwrite('cbg.png', cbg)
+        # cv2.imwrite('cnoskin.png', cnoskin)
+        # cv2.imwrite('img.png', img)
         colors = get_colors(img, cbg, cnoskin)
         img_colors = colorz(colors)
         get_color_name(img_colors)
 
 
-
+        r = 300.0 / origin_img.shape[1]
+        dim = (300, int(origin_img.shape[0] * r))
+        origin_img = cv2.resize(origin_img, dim, interpolation = cv2.INTER_AREA)
+        cv2.circle(origin_img,(30,30), 30, (img_colors[2],img_colors[1],img_colors[0]), -1)
+        cv2.imwrite(str(url[-10:]) + '.png', origin_img)
 
 
 
@@ -265,6 +266,8 @@ def get_styles(url):
         for style in styles:
             print style['large_grid_image_url']
             get_d_color(style['large_grid_image_url'])
+            print '==============================='
+            print ''
 
 
 def save_color(per, v):
@@ -273,10 +276,12 @@ def save_color(per, v):
 
 
 if __name__ == "__main__":
-    for page in range(1,100):
+    for page in range(2,3):
         url = 'http://www.stylekick.com/api/v1/styles?page='
+        # url = 'http://www.stylekick.com/api/v1/styles?color=Black&sort=trending&page='
         get_styles(url + str(page))
-    # get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/7372/rsacl302_lilac')
+
+    # get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/9490/large_grid_4377_pink_black')
 
 
 
