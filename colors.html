@@ -1,0 +1,126 @@
+<html>
+  <head>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+  </head>
+  <body>
+
+    <script>
+platter = {}
+platter['#fffff0'] = 'Ivory'
+platter['#87ceeb'] = 'LightBlue'
+platter['#8800CC'] = 'Purple'
+platter['#808080'] = 'Gray'
+platter['#008000'] = 'Green'
+platter['#0000ff'] = 'Blue'
+platter['#683300'] = 'Brown'
+platter['#000000'] = 'Black'
+platter['#efdeb0'] = 'Beige'
+platter['#000080'] = 'Navy'
+platter['#ffa500'] = 'Orange'
+platter['#ff0000'] = 'Red'
+platter['#ffffff'] = 'White'
+platter['#00ffff'] = 'Aqua'
+platter['#ffff00'] = 'Yellow'
+platter['#9acd32'] = 'YellowGreen'
+platter['#FF69B4'] = 'Pink'
+platter['#5B0124'] = 'Red'
+platter['#d6a789'] = 'SkinColor'
+
+platter['#c8c8c3'] = 'Gray'
+platter['#d3d1d4'] = 'Gray'
+platter['#898b2f'] = 'Green'
+platter['#1f2a33'] = 'Black'
+platter['#e7e7f0'] = 'White'
+platter['#d8ee99'] = 'YellowGreen'
+platter['#d4efb6'] = 'YellowGreen'
+platter['#b4f8c1'] = 'YellowGreen'
+platter['#c29582'] = 'SkinColor'
+platter['#d4a694'] = 'SkinColor'
+platter['#d1ab99'] = 'SkinColor'
+platter['#c88f6f'] = 'SkinColor'
+platter['#f47f6e'] = 'Red'
+platter['#e8a1b1'] = 'Pink'
+platter['#415877'] = 'Navy'
+platter['#dadbeb'] = 'Purple'
+platter['#cfdee8'] = 'LightBlue'
+platter['#bfb3a3'] = 'Beige'
+platter['#1f61c3'] = 'Blue'
+platter['#337074'] = 'Green'
+platter['#028590'] = 'Green'
+platter['#edd7d0'] = 'SkinColor'
+platter['#7c8daa'] = 'Navy'
+platter['#575a67'] = 'Gray'
+platter['#6250a1'] = 'Purple'
+platter['#9289a8'] = 'Purple'
+platter['#6a96bf'] = 'LightBlue'
+
+platter['#2f2e2a'] = 'Gray'
+platter['#3b352c'] = 'Green'
+platter['#4a4442'] = 'Black'
+platter['#7e8c9b'] = 'blue'
+platter['#181d29'] = 'Navy'
+platter['#212b45'] = 'Navy'
+platter['#242b40'] = 'Navy'
+platter['#0b3336'] = 'Green'
+platter['#5b5957'] = 'Gray'
+platter['#6a84a4'] = 'LightBlue'
+platter['#947f75'] = 'Beige'
+platter['#969caa'] = 'Gray'
+platter['#7689c3'] = 'LightBlue'
+platter['#8193c0'] = 'LightBlue'
+platter['#e6ded2'] = 'Beige'
+platter['#f3efeb'] = 'Beige'
+platter['#231e1b'] = 'Black'
+platter['#18171d'] = 'Black'
+platter['#49474d'] = 'Gray'
+platter['#cfced9'] = 'Gray'
+platter['#d4cec9'] = 'Beige'
+platter['#f0eff1'] = 'White'
+platter['#3c3d4c'] = 'Navy'
+platter['#6e636f'] = 'Purple'
+platter['#6b5b3f'] = 'Brown'
+platter['#9b6649'] = 'SkinColor'
+platter['#27716d'] = 'Green'
+platter['#123279'] = 'blue'
+platter['#574332'] = 'Brown'
+platter['#dec6c1'] = 'Pink'
+platter['#e8a79d'] = 'Pink'
+platter['#f3c07f'] = 'Orange'
+platter['#0b1a22'] = 'Navy'
+platter['#93afba'] = 'LightBlue'
+platter['#128ecf'] = 'Blue'
+platter['#717058'] = 'Green'
+
+
+
+
+// new_colors = {'#1b191a': 'Black', '#f1f0f8': 'White', '#6e636f': 'Gray', '#d14e4c': 'Red', '#ba987f': 'SkinColor', '#dec6c1': 'SkinColor', '#262120': 'Black', '#111015': 'Black', '#2a2a3a': 'Navy', '#292a34': 'Navy', '#b4b2b8': 'Gray', '#121529': 'Navy', '#e5e5de': 'Beige', '#242222': 'Black', '#2c292c': 'Black', '#222122': 'Black', '#18181a': 'Black', '#eef2f3': 'White', '#574332': 'Black', '#9ca7b3': 'Gray', '#27716d': 'Green', '#ece9e6': 'Beige', '#221c23': 'Black', '#7a7a72': 'Gray', '#242329': 'Black', '#3c3d4c': 'Gray', '#8c8e9e': 'Gray', '#efebe9': 'Beige', '#028cc3': 'LightBlue', '#123279': 'Navy', '#1a1819': 'Black', '#28262c': 'Black', '#9b6649': 'Beige', '#f6f5f8': 'White', '#e3d7ce': 'Beige', '#222121': 'Black', '#b5a495': 'Beige', '#f4f4f9': 'White', '#c19d83': 'SkinColor', '#6b5b3f': 'Gray', '#eca1a3': 'Pink', '#222023': 'Black', '#212121': 'Black', '#e2e5ec': 'White', '#18161a': 'Black', '#2c3650': 'Navy', '#1e1e1e': 'Black', '#252632': 'Navy', '#d3ced2': 'Gray', '#f3c07f': 'SkinColor', '#dbcbbb': 'Beige', '#faf6f3': 'Beige', '#ccc3b2': 'Beige', '#c5c4ca': 'Gray', '#e2e3e8': 'White', '#1b1a25': 'Black', '#6b7f95': 'LightBlue', '#387aa8': 'LightBlue', '#e8a79d': 'SkinColor', '#7b7053': 'Beige', '#1f2233': 'Navy', '#0f1015': 'Black', '#989794': 'Gray', '#e9e8ef': 'White', '#2c2b2b': 'Gray', '#1c1d2c': 'Navy', '#a19fa9': 'Gray', '#34445f': 'Navy', '#464650': 'Gray', '#232323': 'Black', '#acbcc9': 'LightBlue', '#2e2a2d': 'Black', '#131927': 'Navy', '#2d2c2a': 'Gray', '#fefefe': 'White', '#1a1c27': 'Navy'}
+
+
+var d, hex, name;
+
+for (hex in platter) {
+  name = platter[hex];
+  if ($('#' + name).length == 0) {
+    $("<div>", {id: name}).appendTo("body")
+    $("<hr>").appendTo("body")
+  };
+}
+
+for (hex in platter) {
+  name = platter[hex];
+  $("<span>", {style: "background: " + hex + "; height: 25px; width: 25px; display: inline-block; margin: 2px"}).appendTo($('#' + name))
+
+}
+console.log(new_colors)
+
+for (hex in new_colors) {
+  name = new_colors[hex];
+  console.log(name)
+  $("<span>", {style: "background: " + hex + "; height: 25px; width: 25px; display: inline-block; margin: 2px"}).appendTo($('#' + name))
+
+}
+
+    </script>
+  </body>
+</html>

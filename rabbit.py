@@ -27,22 +27,86 @@ platter['#87ceeb'] = 'LightBlue'
 platter['#8800CC'] = 'Purple'
 platter['#808080'] = 'Gray'
 platter['#008000'] = 'Green'
-
 platter['#0000ff'] = 'Blue'
 platter['#683300'] = 'Brown'
 platter['#000000'] = 'Black'
 platter['#efdeb0'] = 'Beige'
 platter['#000080'] = 'Navy'
-
 platter['#ffa500'] = 'Orange'
 platter['#ff0000'] = 'Red'
 platter['#ffffff'] = 'White'
 platter['#00ffff'] = 'Aqua'
 platter['#ffff00'] = 'Yellow'
-
 platter['#9acd32'] = 'YellowGreen'
 platter['#FF69B4'] = 'Pink'
-platter['#5B0124'] = 'Burgundy'
+platter['#5B0124'] = 'Red'
+platter['#d6a789'] = 'SkinColor'
+
+platter['#c8c8c3'] = 'Gray'
+platter['#d3d1d4'] = 'Gray'
+platter['#898b2f'] = 'Green'
+platter['#1f2a33'] = 'Black'
+platter['#e7e7f0'] = 'White'
+platter['#d8ee99'] = 'YellowGreen'
+platter['#d4efb6'] = 'YellowGreen'
+platter['#b4f8c1'] = 'YellowGreen'
+platter['#c29582'] = 'SkinColor'
+platter['#d4a694'] = 'SkinColor'
+platter['#d1ab99'] = 'SkinColor'
+platter['#c88f6f'] = 'SkinColor'
+platter['#f47f6e'] = 'Red'
+platter['#e8a1b1'] = 'Pink'
+platter['#415877'] = 'Navy'
+platter['#dadbeb'] = 'Purple'
+platter['#cfdee8'] = 'LightBlue'
+platter['#bfb3a3'] = 'Beige'
+platter['#1f61c3'] = 'Blue'
+platter['#337074'] = 'Green'
+platter['#028590'] = 'Green'
+platter['#edd7d0'] = 'SkinColor'
+platter['#7c8daa'] = 'Navy'
+platter['#575a67'] = 'Gray'
+platter['#6250a1'] = 'Purple'
+platter['#9289a8'] = 'Purple'
+platter['#6a96bf'] = 'LightBlue'
+
+platter['#2f2e2a'] = 'Gray'
+platter['#3b352c'] = 'Green'
+platter['#4a4442'] = 'Black'
+platter['#7e8c9b'] = 'blue'
+platter['#181d29'] = 'Navy'
+platter['#212b45'] = 'Navy'
+platter['#242b40'] = 'Navy'
+platter['#0b3336'] = 'Green'
+platter['#5b5957'] = 'Gray'
+platter['#6a84a4'] = 'LightBlue'
+platter['#947f75'] = 'Beige'
+platter['#969caa'] = 'Gray'
+platter['#7689c3'] = 'LightBlue'
+platter['#8193c0'] = 'LightBlue'
+platter['#e6ded2'] = 'Beige'
+platter['#f3efeb'] = 'Beige'
+platter['#231e1b'] = 'Black'
+platter['#18171d'] = 'Black'
+platter['#49474d'] = 'Gray'
+platter['#cfced9'] = 'Gray'
+platter['#d4cec9'] = 'Beige'
+platter['#f0eff1'] = 'White'
+platter['#3c3d4c'] = 'Navy'
+platter['#6e636f'] = 'Purple'
+platter['#6b5b3f'] = 'Brown'
+platter['#9b6649'] = 'SkinColor'
+platter['#27716d'] = 'Green'
+platter['#123279'] = 'blue'
+platter['#574332'] = 'Brown'
+platter['#dec6c1'] = 'Pink'
+platter['#e8a79d'] = 'Pink'
+platter['#f3c07f'] = 'Orange'
+platter['#0b1a22'] = 'Navy'
+platter['#93afba'] = 'LightBlue'
+platter['#128ecf'] = 'Blue'
+platter['#717058'] = 'Green'
+
 
 lab_colors = []
 rgb_color_keys = []
@@ -50,8 +114,9 @@ for rgb_color in platter.keys():
     hex = hex_to_rgb(rgb_color)
     rgb_color_keys.append(rgb_color)
     lab_colors.append(RGBColor(hex[0],hex[1],hex[2]).convert_to('lab'))
-# print lab_colors
-# print platter[lab_colors[2].convert_to('rgb').get_rgb_hex()]
+
+print lab_colors
+print rgb_color_keys
 
 def img_exist(url):
     try:
@@ -127,7 +192,7 @@ def colorz(colors, n=3):
     print 'percentage: ' + str(sizes)
     print 'Color(org): ' + str(map(rtoh, rgbs))
     # for x in range(n):
-    #     save_color(sizes[x], map(rtoh, rgbs)[x])
+    #     save_color('test1', map(rtoh, rgbs)[x])
     return rgbs[sizes.index(max(sizes))]
 
 def euclidean(p1, p2):
@@ -207,7 +272,7 @@ def guess_colors(img, cbg, cnoskin):
         colors = []
         for r in range(0,img.shape[0]):
             for c in range(0,img.shape[1]):
-                if cnoskin[r][c] == 0:
+                if cbg[r][c] == 0:
                     colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
         print 'no bg'
         print len(colors)
@@ -216,7 +281,7 @@ def guess_colors(img, cbg, cnoskin):
         colors = []
         for r in range(0,img.shape[0]):
             for c in range(0,img.shape[1]):
-                if cbg[r][c] == 0:
+                if cnoskin[r][c] == 0:
                     colors.append((int(img[r][c][2]),int(img[r][c][1]),int(img[r][c][0])))
         print 'no skin'
         print len(colors)
@@ -234,14 +299,18 @@ def guess_colors(img, cbg, cnoskin):
 
 
 def get_rbg_color(p):
-    rgbs = [(255, 255, 0), (0, 128, 0), (91, 1, 36), (255, 105, 180), (255, 0, 0), (255, 255, 240), (0, 0, 0), (0, 255, 255), (255, 255, 255), (154, 205, 50), (135, 206, 235), (0, 0, 128), (239, 222, 176), (104, 51, 0), (128, 128, 128), (136, 0, 204), (0, 0, 255), (255, 165, 0)]
     distances = []
-    for c in rgbs:
-        distances.append(int(sqrt(sum([(c[i] - p[i]) ** 2 for i in range(3)]))))
-    # print distances
-    # print min(distances)
-    # print distances.index(min(distances))
-    return rgbs[distances.index(min(distances))]
+    p_lab = RGBColor(p[0],p[1],p[2])
+    print len(lab_colors)
+    for c in lab_colors:
+        distances.append((p_lab).convert_to('lab').delta_e(c))
+    print len(distances)
+    print min(distances)
+    print distances.index(min(distances))
+    return hex_to_rgb(rgb_color_keys[distances.index(min(distances))])
+
+
+platter_new = {}
 
 def get_d_color(url):
     origin_img = img_exist(url)
@@ -272,7 +341,9 @@ def get_d_color(url):
             print rgb
             cv2.putText(origin_img,str(platter[rgb_to_hex(rgb)]),(30,25), font, 1,((rgb[2],rgb[1],rgb[0])),2)
 
-            cv2.imwrite(url.split('/')[-1] + '.png', origin_img)
+            platter_new[rgb_to_hex((img_colors[0],img_colors[1],img_colors[2]))] = str(platter[rgb_to_hex(rgb)])
+            print platter_new
+            cv2.imwrite(rgb_to_hex((img_colors[0],img_colors[1],img_colors[2])) + '.jpg', origin_img)
         except:
             print 'something got wrong'
 
@@ -301,14 +372,13 @@ def save_color(per, v):
 
 
 if __name__ == "__main__":
-    # for page in range(5, 100):
-    #     url = 'http://www.stylekick.com/api/v1/styles?gender=women&sort=trending&page='
-    #     # print url + str(page)
-    #     get_styles(url + str(page))
+    for page in range(14, 15):
+        url = 'http://www.stylekick.com/api/v1/styles?color=red&gender=women&sort=trending&page='
+        # print url + str(page)
+        get_styles(url + str(page))
 
 
-    get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/25402/1281e264208cc950b8e29ffc44d97d7d_best.jpg')
-
+    # get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/1645/large_grid_53_075680.jpg')
 
 
 
