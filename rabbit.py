@@ -42,6 +42,8 @@ platter['#FF69B4'] = 'Pink'
 platter['#5B0124'] = 'Red'
 platter['#d6a789'] = 'SkinColor'
 
+
+
 platter['#c8c8c3'] = 'Gray'
 platter['#d3d1d4'] = 'Gray'
 platter['#898b2f'] = 'Green'
@@ -85,7 +87,7 @@ platter['#969caa'] = 'Gray'
 platter['#7689c3'] = 'LightBlue'
 platter['#8193c0'] = 'LightBlue'
 platter['#e6ded2'] = 'Beige'
-platter['#f3efeb'] = 'Beige'
+platter['#f3efeb'] = 'Ivory'
 platter['#231e1b'] = 'Black'
 platter['#18171d'] = 'Black'
 platter['#49474d'] = 'Gray'
@@ -106,6 +108,38 @@ platter['#0b1a22'] = 'Navy'
 platter['#93afba'] = 'LightBlue'
 platter['#128ecf'] = 'Blue'
 platter['#717058'] = 'Green'
+platter['#626e80'] = 'Navy'
+platter['#7d7f8d'] = 'Gray'
+platter['#c34e30'] = 'Orange'
+platter['#128ecf'] = 'Blue'
+platter['#218591'] = 'Aqua'
+platter['#c70626'] = 'Red'
+platter['#5f534d'] = 'Brown'
+platter['#312d35'] = 'Black'
+platter['#31559c'] = 'Blue'
+platter['#e3b5a9'] = 'Pink'
+platter['#eee4e6'] = 'Pink'
+platter['#c1d8d3'] = 'Green'
+platter['#d3d4c5'] = 'YellowGreen'
+platter['#e8e7de'] = 'Ivory'
+platter['#fb5028'] = 'Orange'
+platter['#fda08e'] = 'Peach'
+platter['#2a272e'] = 'Gray'
+platter['#3e225b'] = 'Purple'
+platter['#3d363f'] = 'Gray'
+platter['#d2bfb5'] = 'SkinColor'
+platter['#d8d2c7'] = 'Ivory'
+platter['#2c2b2a'] = 'Black'
+platter['#252428'] = 'Black'
+platter['#222026'] = 'Black'
+platter['#352e29'] = 'Black'
+platter['#6c696d'] = 'Gray'
+platter['#52bdc0'] = 'Aqua'
+platter['#321d18'] = 'Brown'
+platter['#332c26'] = 'Brown'
+platter['#382c29'] = 'Brown'
+platter['#f6f6c1'] = 'Yellow'
+platter['#2b181c'] = 'Black'
 
 
 lab_colors = []
@@ -372,7 +406,7 @@ def save_color(per, v):
 
 
 if __name__ == "__main__":
-    for page in range(14, 15):
+    for page in range(26, 30):
         url = 'http://www.stylekick.com/api/v1/styles?color=red&gender=women&sort=trending&page='
         # print url + str(page)
         get_styles(url + str(page))
