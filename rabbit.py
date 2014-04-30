@@ -10,149 +10,48 @@ import random
 from PIL import Image
 import json
 from firebase import firebase
+from colormath.color_objects import RGBColor
+
+def hex_to_rgb(value):
+    value = value.lstrip('#')
+    lv = len(value)
+    return tuple(int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
+
+def rgb_to_hex(rgb):
+    return '#%02x%02x%02x' % rgb
 
 firebase = firebase.FirebaseApplication('https://stylekick-colors.firebaseio.com/', None)
 platter = {}
-platter['#f0f8ff'] = 'AliceBlue'
-platter['#faebd7'] = 'AntiqueWhite'
-platter['#00ffff'] = 'Aqua'
-platter['#7fffd4'] = 'Aquamarine'
-platter['#f0ffff'] = 'Azure'
-platter['#f5f5dc'] = 'Beige'
-platter['#ffe4c4'] = 'Bisque'
-platter['#000000'] = 'Black'
-platter['#ffebcd'] = 'BlanchedAlmond'
-platter['#0000ff'] = 'Blue'
-platter['#8a2be2'] = 'BlueViolet'
-platter['#a52a2a'] = 'Brown'
-platter['#deb887'] = 'BurlyWood'
-platter['#5f9ea0'] = 'CadetBlue'
-platter['#7fff00'] = 'Chartreuse'
-platter['#d2691e'] = 'Chocolate'
-platter['#ff7f50'] = 'Coral'
-platter['#6495ed'] = 'CornflowerBlue'
-platter['#fff8dc'] = 'Cornsilk'
-platter['#dc143c'] = 'Crimson'
-platter['#00ffff'] = 'Cyan'
-platter['#00008b'] = 'DarkBlue'
-platter['#008b8b'] = 'DarkCyan'
-platter['#b8860b'] = 'DarkGoldenRod'
-platter['#a9a9a9'] = 'DarkGray'
-platter['#006400'] = 'DarkGreen'
-platter['#bdb76b'] = 'DarkKhaki'
-platter['#8b008b'] = 'DarkMagenta'
-platter['#556b2f'] = 'DarkOliveGreen'
-platter['#ff8c00'] = 'DarkOrange'
-platter['#9932cc'] = 'DarkOrchid'
-platter['#8b0000'] = 'DarkRed'
-platter['#e9967a'] = 'DarkSalmon'
-platter['#8fbc8f'] = 'DarkSeaGreen'
-platter['#483d8b'] = 'DarkSlateBlue'
-platter['#2f4f4f'] = 'DarkSlateGray'
-platter['#00ced1'] = 'DarkTurquoise'
-platter['#9400d3'] = 'DarkViolet'
-platter['#ff1493'] = 'DeepPink'
-platter['#00bfff'] = 'DeepSkyBlue'
-platter['#696969'] = 'DimGray'
-platter['#1e90ff'] = 'DodgerBlue'
-platter['#b22222'] = 'FireBrick'
-platter['#fffaf0'] = 'FloralWhite'
-platter['#228b22'] = 'ForestGreen'
-platter['#ff00ff'] = 'Fuchsia'
-platter['#dcdcdc'] = 'Gainsboro'
-platter['#f8f8ff'] = 'GhostWhite'
-platter['#ffd700'] = 'Gold'
-platter['#daa520'] = 'GoldenRod'
+platter['#fffff0'] = 'Ivory'
+platter['#87ceeb'] = 'LightBlue'
+platter['#8800CC'] = 'Purple'
 platter['#808080'] = 'Gray'
 platter['#008000'] = 'Green'
-platter['#adff2f'] = 'GreenYellow'
-platter['#f0fff0'] = 'HoneyDew'
-platter['#ff69b4'] = 'HotPink'
-platter['#cd5c5c'] = 'IndianRed'
-platter['#4b0082'] = 'Indigo'
-platter['#fffff0'] = 'Ivory'
-platter['#f0e68c'] = 'Khaki'
-platter['#e6e6fa'] = 'Lavender'
-platter['#fff0f5'] = 'LavenderBlush'
-platter['#7cfc00'] = 'LawnGreen'
-platter['#fffacd'] = 'LemonChiffon'
-platter['#add8e6'] = 'LightBlue'
-platter['#f08080'] = 'LightCoral'
-platter['#e0ffff'] = 'LightCyan'
-platter['#fafad2'] = 'LightGoldenRodYellow'
-platter['#d3d3d3'] = 'LightGray'
-platter['#90ee90'] = 'LightGreen'
-platter['#ffb6c1'] = 'LightPink'
-platter['#ffa07a'] = 'LightSalmon'
-platter['#20b2aa'] = 'LightSeaGreen'
-platter['#87cefa'] = 'LightSkyBlue'
-platter['#778899'] = 'LightSlateGray'
-platter['#b0c4de'] = 'LightSteelBlue'
-platter['#ffffe0'] = 'LightYellow'
-platter['#00ff00'] = 'Lime'
-platter['#32cd32'] = 'LimeGreen'
-platter['#faf0e6'] = 'Linen'
-platter['#ff00ff'] = 'Magenta'
-platter['#800000'] = 'Maroon'
-platter['#66cdaa'] = 'MediumAquaMarine'
-platter['#0000cd'] = 'MediumBlue'
-platter['#ba55d3'] = 'MediumOrchid'
-platter['#9370db'] = 'MediumPurple'
-platter['#3cb371'] = 'MediumSeaGreen'
-platter['#7b68ee'] = 'MediumSlateBlue'
-platter['#00fa9a'] = 'MediumSpringGreen'
-platter['#48d1cc'] = 'MediumTurquoise'
-platter['#c71585'] = 'MediumVioletRed'
-platter['#191970'] = 'MidnightBlue'
-platter['#f5fffa'] = 'MintCream'
-platter['#ffe4e1'] = 'MistyRose'
-platter['#ffe4b5'] = 'Moccasin'
-platter['#ffdead'] = 'NavajoWhite'
+
+platter['#0000ff'] = 'Blue'
+platter['#683300'] = 'Brown'
+platter['#000000'] = 'Black'
+platter['#efdeb0'] = 'Beige'
 platter['#000080'] = 'Navy'
-platter['#fdf5e6'] = 'OldLace'
-platter['#808000'] = 'Olive'
-platter['#6b8e23'] = 'OliveDrab'
+
 platter['#ffa500'] = 'Orange'
-platter['#ff4500'] = 'OrangeRed'
-platter['#da70d6'] = 'Orchid'
-platter['#eee8aa'] = 'PaleGoldenRod'
-platter['#98fb98'] = 'PaleGreen'
-platter['#afeeee'] = 'PaleTurquoise'
-platter['#db7093'] = 'PaleVioletRed'
-platter['#ffefd5'] = 'PapayaWhip'
-platter['#ffdab9'] = 'PeachPuff'
-platter['#cd853f'] = 'Peru'
-platter['#ffc0cb'] = 'Pink'
-platter['#dda0dd'] = 'Plum'
-platter['#b0e0e6'] = 'PowderBlue'
-platter['#800080'] = 'Purple'
 platter['#ff0000'] = 'Red'
-platter['#bc8f8f'] = 'RosyBrown'
-platter['#4169e1'] = 'RoyalBlue'
-platter['#8b4513'] = 'SaddleBrown'
-platter['#fa8072'] = 'Salmon'
-platter['#f4a460'] = 'SandyBrown'
-platter['#2e8b57'] = 'SeaGreen'
-platter['#fff5ee'] = 'SeaShell'
-platter['#a0522d'] = 'Sienna'
-platter['#c0c0c0'] = 'Silver'
-platter['#87ceeb'] = 'SkyBlue'
-platter['#6a5acd'] = 'SlateBlue'
-platter['#708090'] = 'SlateGray'
-platter['#fffafa'] = 'Snow'
-platter['#00ff7f'] = 'SpringGreen'
-platter['#4682b4'] = 'SteelBlue'
-platter['#d2b48c'] = 'Tan'
-platter['#008080'] = 'Teal'
-platter['#d8bfd8'] = 'Thistle'
-platter['#ff6347'] = 'Tomato'
-platter['#40e0d0'] = 'Turquoise'
-platter['#ee82ee'] = 'Violet'
-platter['#f5deb3'] = 'Wheat'
 platter['#ffffff'] = 'White'
-platter['#f5f5f5'] = 'WhiteSmoke'
+platter['#00ffff'] = 'Aqua'
 platter['#ffff00'] = 'Yellow'
+
 platter['#9acd32'] = 'YellowGreen'
+platter['#FF69B4'] = 'Pink'
+platter['#5B0124'] = 'Burgundy'
+
+lab_colors = []
+rgb_color_keys = []
+for rgb_color in platter.keys():
+    hex = hex_to_rgb(rgb_color)
+    rgb_color_keys.append(rgb_color)
+    lab_colors.append(RGBColor(hex[0],hex[1],hex[2]).convert_to('lab'))
+# print lab_colors
+# print platter[lab_colors[2].convert_to('rgb').get_rgb_hex()]
 
 def img_exist(url):
     try:
@@ -332,16 +231,10 @@ def guess_colors(img, cbg, cnoskin):
 
     return colors
 
-def hex_to_rgb(value):
-    value = value.lstrip('#')
-    lv = len(value)
-    return tuple(int(value[i:i+lv/3], 16) for i in range(0, lv, lv/3))
 
-def rgb_to_hex(rgb):
-    return '#%02x%02x%02x' % rgb
 
 def get_rbg_color(p):
-    rgbs = [(128, 128, 128), (173, 255, 47), (255, 245, 238), (85, 107, 47), (255, 140, 0), (153, 50, 204), (138, 43, 226), (186, 85, 211), (47, 79, 79), (0, 0, 139), (219, 112, 147), (0, 0, 255), (220, 20, 60), (221, 160, 221), (65, 105, 225), (218, 112, 214), (220, 220, 220), (95, 158, 160), (147, 112, 219), (175, 238, 238), (230, 230, 250), (0, 0, 0), (107, 142, 35), (255, 105, 180), (240, 248, 255), (34, 139, 34), (0, 139, 139), (255, 127, 80), (238, 130, 238), (211, 211, 211), (255, 0, 255), (72, 209, 204), (255, 255, 255), (245, 222, 179), (0, 250, 154), (240, 128, 128), (128, 128, 0), (250, 235, 215), (169, 169, 169), (127, 255, 212), (192, 192, 192), (127, 255, 0), (255, 235, 205), (176, 196, 222), (119, 136, 153), (255, 250, 205), (255, 215, 0), (0, 128, 0), (139, 69, 19), (255, 240, 245), (255, 255, 240), (106, 90, 205), (128, 0, 128), (255, 250, 250), (70, 130, 180), (255, 239, 213), (238, 232, 170), (0, 255, 0), (255, 222, 173), (205, 133, 63), (173, 216, 230), (152, 251, 152), (224, 255, 255), (248, 248, 255), (216, 191, 216), (188, 143, 143), (255, 0, 0), (0, 0, 128), (0, 206, 209), (160, 82, 45), (255, 192, 203), (123, 104, 238), (205, 92, 92), (46, 139, 87), (184, 134, 11), (255, 160, 122), (64, 224, 208), (250, 250, 210), (222, 184, 135), (240, 255, 255), (255, 248, 220), (233, 150, 122), (135, 206, 235), (25, 25, 112), (144, 238, 144), (210, 180, 140), (0, 255, 255), (0, 0, 205), (124, 252, 0), (255, 228, 225), (189, 183, 107), (244, 164, 96), (240, 255, 240), (60, 179, 113), (245, 255, 250), (32, 178, 170), (30, 144, 255), (112, 128, 144), (245, 245, 220), (102, 205, 170), (154, 205, 50), (199, 21, 133), (245, 245, 245), (50, 205, 50), (139, 0, 0), (105, 105, 105), (148, 0, 211), (143, 188, 143), (0, 191, 255), (72, 61, 139), (100, 149, 237), (255, 165, 0), (0, 255, 127), (165, 42, 42), (250, 240, 230), (0, 128, 128), (255, 228, 181), (255, 99, 71), (178, 34, 34), (218, 165, 32), (75, 0, 130), (255, 250, 240), (176, 224, 230), (240, 230, 140), (255, 255, 0), (0, 100, 0), (255, 228, 196), (253, 245, 230), (139, 0, 139), (255, 255, 224), (250, 128, 114), (255, 218, 185), (210, 105, 30), (255, 20, 147), (255, 182, 193), (128, 0, 0), (135, 206, 250), (255, 69, 0)]
+    rgbs = [(255, 255, 0), (0, 128, 0), (91, 1, 36), (255, 105, 180), (255, 0, 0), (255, 255, 240), (0, 0, 0), (0, 255, 255), (255, 255, 255), (154, 205, 50), (135, 206, 235), (0, 0, 128), (239, 222, 176), (104, 51, 0), (128, 128, 128), (136, 0, 204), (0, 0, 255), (255, 165, 0)]
     distances = []
     for c in rgbs:
         distances.append(int(sqrt(sum([(c[i] - p[i]) ** 2 for i in range(3)]))))
@@ -349,9 +242,6 @@ def get_rbg_color(p):
     # print min(distances)
     # print distances.index(min(distances))
     return rgbs[distances.index(min(distances))]
-
-def compare_color(bg, img):
-    pass
 
 def get_d_color(url):
     origin_img = img_exist(url)
@@ -411,13 +301,13 @@ def save_color(per, v):
 
 
 if __name__ == "__main__":
-    for page in range(5, 100):
-        url = 'http://www.stylekick.com/api/v1/styles?gender=women&sort=trending&page='
-        # print url + str(page)
-        get_styles(url + str(page))
+    # for page in range(5, 100):
+    #     url = 'http://www.stylekick.com/api/v1/styles?gender=women&sort=trending&page='
+    #     # print url + str(page)
+    #     get_styles(url + str(page))
 
 
-    # get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/108546/large_grid_7d43975e6f83a2edd6d845804058f822_best.jpg')
+    get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/25402/1281e264208cc950b8e29ffc44d97d7d_best.jpg')
 
 
 
