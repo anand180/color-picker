@@ -11,6 +11,8 @@ from PIL import Image
 import json
 from firebase import firebase
 from colormath.color_objects import RGBColor
+from flask import Flask
+from flask import request
 
 def hex_to_rgb(value):
     value = value.lstrip('#')
@@ -21,6 +23,7 @@ def rgb_to_hex(rgb):
     return '#%02x%02x%02x' % rgb
 
 firebase = firebase.FirebaseApplication('https://stylekick-colors.firebaseio.com/', None)
+
 platter = {}
 platter['#fffff0'] = 'Ivory'
 platter['#87ceeb'] = 'LightBlue'
@@ -464,8 +467,8 @@ for rgb_color in platter.keys():
     rgb_color_keys.append(rgb_color)
     lab_colors.append(RGBColor(hex[0],hex[1],hex[2]).convert_to('lab'))
 
-print lab_colors
-print rgb_color_keys
+# print lab_colors
+# print rgb_color_keys
 
 def img_exist(url):
     try:
@@ -678,21 +681,25 @@ def get_d_color(url):
             # cv2.imwrite('cbg.png', cbg)
             # cv2.imwrite('cnoskin.png', cnoskin)
             # cv2.imwrite('img.png', img)
+            print ' === === process ==='
             colors = get_colors(img, cbg, cnoskin)
+            print 'color: ' + str(color)
             img_colors = colorz(colors)
+            print str(img_colors)
             rgb = get_rbg_color(img_colors)
+            print 'hex: ' + str(platter[rgb_to_hex(rgb)])
+            return platter[rgb_to_hex(rgb)]
+            # r = 300.0 / origin_img.shape[1]
+            # dim = (300, int(origin_img.shape[0] * r))
+            # origin_img = cv2.resize(origin_img, dim, interpolation = cv2.INTER_AREA)
+            # font = cv2.FONT_HERSHEY_SIMPLEX
+            # cv2.circle(origin_img,(15,15), 15, (img_colors[2],img_colors[1],img_colors[0]), -1)
+            # print rgb
+            # cv2.putText(origin_img,str(platter[rgb_to_hex(rgb)]),(30,25), font, 1,((rgb[2],rgb[1],rgb[0])),2)
 
-            r = 300.0 / origin_img.shape[1]
-            dim = (300, int(origin_img.shape[0] * r))
-            origin_img = cv2.resize(origin_img, dim, interpolation = cv2.INTER_AREA)
-            font = cv2.FONT_HERSHEY_SIMPLEX
-            cv2.circle(origin_img,(15,15), 15, (img_colors[2],img_colors[1],img_colors[0]), -1)
-            print rgb
-            cv2.putText(origin_img,str(platter[rgb_to_hex(rgb)]),(30,25), font, 1,((rgb[2],rgb[1],rgb[0])),2)
-
-            platter_new[rgb_to_hex((img_colors[0],img_colors[1],img_colors[2]))] = str(platter[rgb_to_hex(rgb)])
-            print platter_new
-            cv2.imwrite(rgb_to_hex((img_colors[0],img_colors[1],img_colors[2])) + '.jpg', origin_img)
+            # platter_new[rgb_to_hex((img_colors[0],img_colors[1],img_colors[2]))] = str(platter[rgb_to_hex(rgb)])
+            # print platter_new
+            # cv2.imwrite(rgb_to_hex((img_colors[0],img_colors[1],img_colors[2])) + '.jpg', origin_img)
         except:
             print 'something got wrong'
 
@@ -720,14 +727,24 @@ def save_color(per, v):
     print result
 
 
+app = Flask(__name__)
+
+
+
 if __name__ == "__main__":
-    for page in range(26, 30):
-        url = 'http://www.stylekick.com/api/v1/styles?color=red&gender=women&sort=trending&page='
-        # print url + str(page)
-        get_styles(url + str(page))
+    # for page in range(26, 30):
+    #     url = 'http://www.stylekick.com/api/v1/styles?color=red&gender=women&sort=trending&page='
+    #     # print url + str(page)
+    #     get_styles(url + str(page))
 
 
     # get_d_color('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/1645/large_grid_53_075680.jpg')
+    @app.route('/detect', methods=['POST'])
+    def detect():
+        url = json.loads(request.data)['url']
+        color = get_d_color(url)
+        print color
+        return color
 
-
-
+    # app.debug = True
+    app.run()
