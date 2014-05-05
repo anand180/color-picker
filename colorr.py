@@ -1,4 +1,4 @@
-import sys, json, time, traceback
+import sys, json
 import cv2
 import urllib
 import numpy as np
@@ -10,6 +10,7 @@ import json
 from colormath.color_objects import RGBColor
 from flask import Flask
 from flask import request
+from flask import jsonify
 
 
 class SmallImage:
@@ -68,6 +69,7 @@ class DColor:
     return self.noskin_img
 
   def remove_bg(self):
+
     gray = cv2.cvtColor(self.img,cv2.COLOR_BGR2GRAY)
     ret,thresh = cv2.threshold(gray,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     fg = cv2.erode(thresh,None,iterations = 2)
@@ -75,7 +77,7 @@ class DColor:
     ret,bg = cv2.threshold(bgt,1,128,1)
     marker = cv2.add(fg,bg)
     marker32 = np.int32(marker)
-    cv2.watershed(img,marker32)
+    cv2.watershed(self.img,marker32)
     m = cv2.convertScaleAbs(marker32)
     self.nobg_img = cv2.threshold(m,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)[1]
     return self.nobg_img
@@ -161,9 +163,6 @@ class DColor:
       self.main_colors_count.append(len(self.clusters[x].points)/(len(pixels)/100))
     self.main_colors_in_rbg = [map(int, c.center.coords) for c in self.clusters]
     self.main_colors_in_hex = [self.rgb_to_hex((c[0], c[1], c[2])) for c in self.main_colors_in_rbg]
-
-    print self.main_colors_in_hex
-    print self.main_colors_count
     return self
 
   def platter_colors(self):
@@ -174,7 +173,6 @@ class DColor:
       for c in self.lab_colors:
           distances.append((p_lab).convert_to('lab').delta_e(c))
       self.main_colors_in_platter.append(DColor.Platter[self.rgb_color_keys[distances.index(min(distances))]])
-    print self.main_colors_in_platter
     return self
 
 class KMean:
@@ -230,6 +228,26 @@ class KMean:
 
     return clusters
 
+app = Flask(__name__)
+if __name__ == "__main__":
+  # img = SmallImage('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/181405/hmprod').shrinked_and_blurred()
+  # colors = DColor(img).remove_skin_bg_and_crop().main_colors().platter_colors()
 
-img = SmallImage('https://stylekick-assets.s3.amazonaws.com/uploads/style/image/169988/2360_8041_759_f').shrinked_and_blurred()
-DColor(img).remove_skin_bg_and_crop().main_colors().platter_colors()
+  # print colors.main_colors_in_platter
+  # print colors.main_colors_count
+
+
+  @app.route('/detect', methods=['POST', 'GET'])
+  def detect():
+    url = json.loads(request.data)['url']
+    img = SmallImage(url).shrinked_and_blurred()
+    colors = DColor(img).remove_skin_bg_and_crop().main_colors().platter_colors()
+    return jsonify(
+      main_color=colors.main_colors_in_platter[colors.main_colors_count.index(max(colors.main_colors_count))],
+      main_colors=colors.main_colors_in_platter,
+      main_percentages=colors.main_colors_count
+      )
+
+  app.run(debug = True)
+
+
